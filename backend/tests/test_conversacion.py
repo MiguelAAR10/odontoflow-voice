@@ -164,3 +164,23 @@ def test_inventario_completo_cierra_solo(catalogo):
     out = hablar(s, "listo", catalogo)
     assert s.terminado
     assert "actualizados" in out[0].texto.lower()
+
+
+# ------------------------------------------------------------ menú numerado
+
+@pytest.mark.parametrize("respuesta,esperado", [
+    ("1", "consulta"), ("2", "inventario"),
+    ("opción 2", "inventario"), ("la 1", "consulta"),
+    ("uno", "consulta"), ("dos", "inventario"),
+])
+def test_menu_acepta_numero(catalogo, respuesta, esperado):
+    s = Sesion()
+    hablar(s, "hola", catalogo)
+    hablar(s, respuesta, catalogo)
+    assert s.flujo == esperado
+
+
+def test_el_menu_muestra_los_numeros(catalogo):
+    s = Sesion()
+    out = hablar(s, "hola", catalogo)
+    assert "1 ·" in out[0].texto and "2 ·" in out[0].texto

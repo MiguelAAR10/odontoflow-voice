@@ -126,8 +126,23 @@ def _resumen_consulta(datos: dict[str, Any]) -> dict[str, Any]:
 # ------------------------------------------------------------------ motor
 
 
+# El médico puede contestar "1"/"2" o hablar. Lo primero es más rápido cuando
+# ya conoce el flujo; lo segundo es lo natural la primera vez.
+POR_NUMERO = {"1": "consulta", "2": "inventario"}
+
+
 def _detectar_flujo(texto: str) -> str | None:
     t = limpiar(texto)
+    if t in POR_NUMERO:
+        return POR_NUMERO[t]
+    # "opcion 2", "la 2", "dos"
+    for numero, codigo in POR_NUMERO.items():
+        if t in {f"opcion {numero}", f"la {numero}", f"el {numero}"}:
+            return codigo
+    if t in {"uno", "una"}:
+        return "consulta"
+    if t == "dos":
+        return "inventario"
     for codigo, claves in DISPARADORES.items():
         if any(limpiar(k) in t for k in claves):
             return codigo
@@ -137,9 +152,9 @@ def _detectar_flujo(texto: str) -> str | None:
 def _menu(sesion: Sesion) -> None:
     sesion.decir(
         "Hola. ¿Qué vamos a hacer hoy?\n"
-        "· El resumen de una consulta que acabas de atender\n"
-        "· La auditoría de inventario de insumos\n"
-        "Dímelo con tus palabras."
+        "1 · Resumen de una consulta que acabas de atender\n"
+        "2 · Auditoría de inventario de insumos\n"
+        "Responde con el número o dímelo con tus palabras."
     )
 
 

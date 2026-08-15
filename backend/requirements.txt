@@ -1,0 +1,11 @@
+# Directas. Lo demás lo arrastra pip (starlette, pydantic, tokenizers, onnxruntime…).
+fastapi==0.141.1
+uvicorn[standard]==0.52.3
+python-multipart==0.0.32   # subida del audio por multipart
+httpx==0.28.1              # cliente del adaptador de WhatsApp y de auditar.py
+
+faster-whisper==1.2.1
+ctranslate2==4.8.1
+
+# Desarrollo
+pytest==9.1.1

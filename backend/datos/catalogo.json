@@ -1,0 +1,37 @@
+{
+  "_nota": "Catálogo cerrado. El parser NUNCA inventa un SKU: solo matchea contra esta lista. Los alias son cómo la gente lo DICE, no cómo está en la factura.",
+
+  "insumos": [
+    { "sku": "PASTA-DENTAL",  "nombre": "Pasta dental",        "alias": ["pasta", "pastas", "crema dental", "pasta dental", "colgate"] },
+    { "sku": "CEPILLO",       "nombre": "Cepillo dental",      "alias": ["cepillo", "cepillos"] },
+    { "sku": "HILO-DENTAL",   "nombre": "Hilo dental",         "alias": ["hilo", "hilos", "hilo dental", "seda dental"] },
+    { "sku": "ENJUAGUE",      "nombre": "Enjuague bucal",      "alias": ["enjuague", "enjuagues", "enjuague bucal", "colutorio"] },
+    { "sku": "KIT-BLANQ",     "nombre": "Kit de blanqueamiento", "alias": ["kit", "kits", "kit de blanqueamiento", "kit blanqueador"] },
+    { "sku": "RESINA",        "nombre": "Resina compuesta",    "alias": ["resina", "resinas"] },
+    { "sku": "ANESTESIA",     "nombre": "Anestesia (carpule)", "alias": ["anestesia", "anestesias", "carpule", "carpules"] },
+    { "sku": "GUANTES",       "nombre": "Guantes (caja)",      "alias": ["guantes", "caja de guantes", "cajas de guantes"] },
+    { "sku": "AGUJA",         "nombre": "Aguja dental",        "alias": ["aguja", "agujas"] },
+    { "sku": "ALGODON",       "nombre": "Algodón (rollo)",     "alias": ["algodon", "algodones", "rollo de algodon", "rollos de algodon"] },
+    { "sku": "FLUOR",         "nombre": "Flúor",               "alias": ["fluor", "gel de fluor", "barniz de fluor"] },
+    { "sku": "EYECTOR",       "nombre": "Eyector de saliva",   "alias": ["eyector", "eyectores", "suctor", "suctores"] }
+  ],
+
+  "tratamientos": [
+    { "codigo": "PROFILAXIS",  "nombre": "Profilaxis / limpieza", "alias": ["limpieza", "limpiezas", "profilaxis", "destartraje"] },
+    { "codigo": "RESINA-SIMPLE","nombre": "Curación con resina",  "alias": ["resina", "resinas", "curacion", "curaciones", "restauracion"] },
+    { "codigo": "ORTO-CONTROL","nombre": "Control de ortodoncia", "alias": ["control de ortodoncia", "ortodoncia", "control", "cambio de ligas", "ligas", "ajuste de brackets", "brackets", "braquets"] },
+    { "codigo": "EXTRACCION",  "nombre": "Extracción",            "alias": ["extraccion", "extracciones", "exodoncia", "sacar la muela", "sacada de muela"] },
+    { "codigo": "IMPLANTE",    "nombre": "Implante",              "alias": ["implante", "implantes"] },
+    { "codigo": "PROTESIS",    "nombre": "Prótesis",              "alias": ["protesis", "placa", "puente", "corona", "coronas"] },
+    { "codigo": "BLANQUEAM",   "nombre": "Blanqueamiento",        "alias": ["blanqueamiento", "blanqueado"] },
+    { "codigo": "CONSULTA",    "nombre": "Consulta",              "alias": ["consulta", "evaluacion", "chequeo"] }
+  ],
+
+  "metodos_pago": [
+    { "codigo": "efectivo",     "alias": ["efectivo", "cash", "en efectivo"] },
+    { "codigo": "yape",         "alias": ["yape", "yapeo", "yapeó", "por yape"] },
+    { "codigo": "plin",         "alias": ["plin", "por plin"] },
+    { "codigo": "transferencia","alias": ["transferencia", "transferencia bancaria", "deposito", "bcp", "interbank", "bbva", "scotiabank"] },
+    { "codigo": "tarjeta",      "alias": ["tarjeta", "pos", "visa", "mastercard", "izipay"] }
+  ]
+}

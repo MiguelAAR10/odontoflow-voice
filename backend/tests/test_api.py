@@ -80,3 +80,27 @@ def test_sesiones_no_se_pisan():
 
 def test_sesion_inexistente_da_404():
     assert cliente.get("/sesion/noexiste").status_code == 404
+
+
+def test_editar_campo_reinterpreta_con_el_parser():
+    """El lápiz del resumen debe producir el MISMO dato que dictarlo."""
+    sid = cliente.post("/mensaje", json={"texto": "consulta"}).json()["sesion_id"]
+    for t in ["Ana Flores", "una limpieza", "dos anestesias",
+              "ochenta soles en efectivo", "ninguna"]:
+        cliente.post("/mensaje", json={"sesion_id": sid, "texto": t})
+
+    r = cliente.post(f"/sesion/{sid}/campo",
+                     json={"campo": "insumos", "texto": "cuatro agujas y un algodón"}).json()
+    consumo = {c["codigo"]: c["cantidad_consumida"] for c in r["resumen"]["consumo"]}
+    assert consumo == {"AGUJA": 4, "ALGODON": 1}
+
+    r = cliente.post(f"/sesion/{sid}/campo",
+                     json={"campo": "cobro", "texto": "ciento veinte soles con Yape"}).json()
+    assert r["resumen"]["total_bruto"] == 120
+    assert r["resumen"]["metodos_pago"] == ["yape"]
+
+
+def test_editar_campo_invalido_da_400():
+    sid = cliente.post("/mensaje", json={"texto": "consulta"}).json()["sesion_id"]
+    r = cliente.post(f"/sesion/{sid}/campo", json={"campo": "inventado", "texto": "x"})
+    assert r.status_code == 400

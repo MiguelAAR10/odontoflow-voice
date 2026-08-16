@@ -278,6 +278,39 @@ def procesar(sesion: Sesion, entrada: Entrada, catalogo: Catalogo,
     return sesion.mensajes[desde + 1:]
 
 
+CAMPOS_EDITABLES = {"paciente", "tratamientos", "insumos", "cobro", "observaciones"}
+
+
+def editar_campo(sesion: Sesion, campo: str, texto: str, catalogo: Catalogo) -> dict[str, Any]:
+    """Corrige un campo ya recolectado, re-interpretando el texto con el parser.
+
+    Es lo que hay detrás de los lápices del resumen. No se guarda el texto
+    crudo: se vuelve a pasar por las mismas reglas que la respuesta hablada,
+    para que corregir a mano y dictar produzcan exactamente el mismo dato.
+    """
+    if campo not in CAMPOS_EDITABLES:
+        raise ValueError(f"campo no editable: {campo}")
+
+    if campo in {"tratamientos", "insumos"}:
+        familias = ("tratamiento",) if campo == "tratamientos" else ("insumo",)
+        sesion.datos[campo] = [
+            {"codigo": i.codigo, "nombre": i.nombre,
+             "cantidad": i.cantidad, "confianza": i.confianza}
+            for i in extraer_items(texto, catalogo, familias=familias)
+        ]
+    elif campo == "cobro":
+        montos = extraer_montos(texto)
+        sesion.datos[campo] = {
+            "monto": max(montos) if montos else None,
+            "montos_detectados": montos,
+            "pagos": extraer_pagos(texto, catalogo),
+        }
+    else:
+        sesion.datos[campo] = texto.strip()
+
+    return _resumen_consulta(sesion.datos)
+
+
 def a_dict(sesion: Sesion) -> dict[str, Any]:
     d = asdict(sesion)
     d["mensajes"] = [asdict(m) for m in sesion.mensajes]

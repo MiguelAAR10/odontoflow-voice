@@ -17,7 +17,8 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from .conversacion import Entrada, Mensaje, Sesion, a_dict, procesar
+from .conversacion import Entrada, Mensaje, Sesion, a_dict, editar_campo, procesar
+from .flujos import FLUJOS
 from .parser import Catalogo
 from .transcriptor import Transcripcion, transcribir
 
@@ -65,10 +66,16 @@ def _sesion(sesion_id: str | None) -> Sesion:
 
 def _respuesta(sesion: Sesion, nuevos: list[Mensaje],
                transcripcion: Transcripcion | None = None) -> dict:
+    preguntas = FLUJOS["consulta"].preguntas if sesion.flujo == "consulta" else ()
     return {
         "sesion_id": sesion.id,
         "flujo": sesion.flujo,
         "terminado": sesion.terminado,
+        # El stepper de la interfaz sale de acá, no de parsear el texto del bot.
+        "paso": sesion.paso,
+        "total_pasos": len(preguntas),
+        "pasos": [p.campo for p in preguntas],
+        "pregunta": preguntas[sesion.paso].texto if sesion.paso < len(preguntas) else None,
         "mensajes": [
             {"de": m.de, "texto": m.texto, "ts": m.ts, "adjunto": m.adjunto}
             for m in nuevos
@@ -133,6 +140,29 @@ async def audio(archivo: UploadFile = File(...), sesion_id: str | None = Form(No
     s = _sesion(sesion_id)
     nuevos = procesar(s, Entrada(t.texto, es_audio=True), CATALOGO, CONTEO_PREVIO)
     return _respuesta(s, nuevos, t)
+
+
+class EdicionCampo(BaseModel):
+    campo: str
+    texto: str
+
+
+@app.post("/sesion/{sesion_id}/campo")
+def editar(sesion_id: str, cuerpo: EdicionCampo) -> dict:
+    """Corrige un campo del resumen desde los lápices de la interfaz.
+
+    El texto corregido vuelve a pasar por el parser, así que escribir a mano y
+    dictar producen el mismo dato. Nunca se guarda texto crudo sin interpretar.
+    """
+    s = SESIONES.get(sesion_id)
+    if s is None:
+        raise HTTPException(404, "sesión no encontrada")
+    try:
+        resumen = editar_campo(s, cuerpo.campo, cuerpo.texto, CATALOGO)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    return {"sesion_id": s.id, "flujo": s.flujo, "terminado": s.terminado,
+            "resumen": resumen}
 
 
 @app.get("/sesion/{sesion_id}")
